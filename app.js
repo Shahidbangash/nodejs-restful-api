@@ -1,8 +1,10 @@
-var express = require('express');
+var express = require("express");
+bodyParser = require("body-parser");
 var app = express();
-var db = require('./db');
+app.use(bodyParser.json());
+var db = require("./db");
 
-var UserController = require('./user/UserController');
-app.use('/users', UserController);
+var UserController = require("./user/UserController");
+app.use("/users", UserController);
 
 module.exports = app;
