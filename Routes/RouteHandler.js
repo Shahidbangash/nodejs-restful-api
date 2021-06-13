@@ -10,7 +10,9 @@ var User = require("../Models/User");
 router.get("/", function (req, res) {
   User.find({}, function (err, users) {
     if (err)
-      return res.status(500).send("There was a problem finding the users.");
+      return res
+        .status(500)
+        .send(`There was a problem finding the users. ${err}`);
     res.status(200).send(users);
   });
 });
