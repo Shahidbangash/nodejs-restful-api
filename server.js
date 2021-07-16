@@ -19,6 +19,18 @@ app.get("/", cors(corsOptions), function (req, res, next) {
   res.json({ msg: "This is CORS-enabled for only example.com." });
 });
 
+app.post("/fetchPolyLines", cors(corsOptions), function (request, res, next) {
+  var source = request.body.source;
+  var destination = request.body.source;
+
+  fetch(
+    `https://maps.googleapis.com/maps/api/directions/json?origin=${source}&destination=${destination}&mode=driving&key=AIzaSyC92UARV7HJsL0iq2jMsue7JMQJeg2LBcE`
+  ).then((response) => response.json())
+    .then(async function (json) {
+      res.json(json);   
+    }
+);
+
 app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
   var apiKey = "AIzaSyC92UARV7HJsL0iq2jMsue7JMQJeg2LBcE"; // this is My API keys
   // var apiKey = " AIzaSyBoYF-LSJz5rEcndQwVyVQoXK9awzTfdp0"; // dont delete it .. this is cleint API
@@ -26,6 +38,7 @@ app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
   var destination = request.body.destination;
 
   distanceApiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${source}&destinations=${destination}&language=en&key=${apiKey}`;
+
   var responseData = {
     source: "",
     destination: "",
