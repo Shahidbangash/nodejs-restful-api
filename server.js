@@ -25,11 +25,12 @@ app.post("/fetchPolyLines", cors(corsOptions), function (request, res, next) {
 
   fetch(
     `https://maps.googleapis.com/maps/api/directions/json?origin=${source}&destination=${destination}&mode=driving&key=AIzaSyC92UARV7HJsL0iq2jMsue7JMQJeg2LBcE`
-  ).then((response) => response.json())
+  )
+    .then((response) => response.json())
     .then(async function (json) {
-      res.json(json);   
-    }
-);
+      res.json(json);
+    });
+});
 
 app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
   var apiKey = "AIzaSyC92UARV7HJsL0iq2jMsue7JMQJeg2LBcE"; // this is My API keys
