@@ -1,13 +1,20 @@
 var express = require("express");
 var cors = require("cors");
 var app = express();
-
+var admin = require("firebase-admin");
+require("dotenv").config();
 var bodyParser = require("body-parser");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // app.use(express.json());
 const fetch = require("node-fetch");
+const serviceAccount = JSON.parse(process.env.GOOGLE_CREDS);
+admin.initializeApp({
+  // credential: admin.credential.applicationDefault(),
+  credential: admin.credential.cert(serviceAccount),
+});
+// const adminApp = admin.initializeApp();
 
 var corsOptions = {
   origin: "*",
@@ -48,6 +55,9 @@ app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
 
   // sending another api request to get latitude and longitude
   response = fetch(distanceApiUrl)
+    .catch(function (error) {
+      console.log(error);
+    })
     .then((response) => response.json())
     .then(async function (json) {
       // get lattitude and longitude of location
@@ -58,6 +68,9 @@ app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
         .then((json) => {
           var latlong = json["results"][0]["geometry"]["location"];
           return latlong;
+        })
+        .catch(function (error) {
+          console.log(error);
         });
 
       //
@@ -81,6 +94,52 @@ app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
       return;
     });
 });
+
+app.post(
+  "/send-notification",
+  cors(corsOptions),
+  async function (req, res, next) {
+    const { body } = req;
+    const deviceToken =
+      req.query.deviceToken ||
+      body.deviceToken ||
+      (body.data && body.data.deviceToken);
+    console.log(`Token is ${deviceToken}`);
+
+    const senderName = req.body["senderName"];
+    const messageContent = req.body["messageContent"];
+    const receiverID = req.body["receiverID"];
+
+    await admin
+      .messaging()
+      .sendMulticast({
+        tokens: [
+          //   // "dVgKhr8QS1S3C-r-AxwPvh:APA91bGCoVHMIzP0A3A69KRbDThtS916eylvgCSffkxWrHFftKBjnGTzF6_rsDGZnbXWGldMazSGR5xkHfxh0anbA5nAGx97kcbCtGKLVJtpKRbBQEhoj-BTOLCqn6TzxGdH-zY3MOsN",
+          deviceToken,
+        ],
+        notification: {
+          title: senderName,
+          body: messageContent,
+        },
+        data: {
+          notificationType: req.body["notificationType"] || "notprovided",
+          senderID: req.body["senderID"],
+        },
+      })
+      .then(() => {
+        console.log("object");
+      })
+      .catch((error) => {
+        console.log(`Error ${error}`);
+      });
+
+    res.send({
+      confirm: "new project",
+      "deviceToken ": `${deviceToken}`,
+      body: body,
+    });
+  }
+);
 
 var port = process.env.PORT || 3000;
 
