@@ -40,8 +40,8 @@ app.post("/fetchPolyLines", cors(corsOptions), function (request, res, next) {
 });
 
 app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
-  var apiKey = "AIzaSyC92UARV7HJsL0iq2jMsue7JMQJeg2LBcE"; // this is My API keys
-  // var apiKey = " AIzaSyBoYF-LSJz5rEcndQwVyVQoXK9awzTfdp0"; // dont delete it .. this is cleint API
+  var apiKey = process.env.GOOGLE_MAP_APIKEY; // this is My API keys
+  
   var source = request.body.source;
   var destination = request.body.destination;
 
