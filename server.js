@@ -11,13 +11,7 @@ var bodyParser = require("body-parser");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(express.json());
-// const fetch = require("node-fetch");
-// const serviceAccount = JSON.parse(process.env.GOOGLE_CREDS);
-// admin.initializeApp({
-//   // credential: admin.credential.applicationDefault(),
-//   credential: admin.credential.cert(serviceAccount),
-// });
+
 const { pipeline } = require("stream");
 // const adminApp = admin.initializeApp();
 
@@ -100,24 +94,23 @@ app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
     });
 });
 
-app.post("/parse-url", cors(corsOptions), async function (req, res, next) {
+app.post("/parse-url", cors(corsOptions), function (req, res, next) {
   const url = req.body["url"] || req.body.url;
 
   const file = fs.createWriteStream("./file.png");
 
-  await http.get(url, (response) => {
+  http.get(url, (response) => {
     pipeline(response, file, (err) => {
       if (err) console.error("Pipeline failed.", err);
       else {
         console.log(`file $file`);
         console.log("Pipeline succeeded.");
-        var filePath = path.join(__dirname, 'file.png');
+        var filePath = path.join(__dirname, "file.png");
         res.download(filePath);
       }
     });
   });
 });
-
 
 app.get("/parse-url", cors(corsOptions), async function (req, res, next) {
   const url = req.params.url;
