@@ -7,7 +7,7 @@ Create .env file and Add dbuserName , password and Port
 
 To use or test this API You can try these end points
 
-1. [https://getlocationgoogle.herokuapp.com//](https://getlocationgoogle.herokuapp.com/)
+1. [https://getlocationgoogle.herokuapp.com/](https://getlocationgoogle.herokuapp.com/)
 
 
 # Firebase Admin Notification API
