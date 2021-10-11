@@ -115,12 +115,30 @@ app.post("/parse-url", cors(corsOptions), function (req, res, next) {
 
 app.get("/parse-url", cors(corsOptions), function (req, res, next) {
   // const url = req.params.url;
-  const url = req.query.url;
+  var url = req.query.url;
   console.log(`URL is ${url}`);
+  if ( url === null){
+    res.status(400).json({
+      error:"URL is Missing",
+      message:"URL is Mising",
+    });
+  }
+
   const file = fs.createWriteStream("./file.jpg");
   // url = new URL(url);
   var client = new URL(url).protocol == "https" ? https : http;
-  client.get(url, (response) => {
+
+  if (new String(url).split(":")[0].includes("s")){
+    console.log("URL is s");
+    var urlList = new String(url).split(":");
+    urlList[0] = new String(urlList[0]).replace("s" ,"");
+     url = urlList[0] + ":" + urlList[1];
+  }
+  
+  // console.log(`URL is ${url}`);
+  console.log(`Client is ${url}`);
+  console.log(`New URL Protocol is ${new URL(url).protocol}`);
+  http.get(url, (response) => {
     pipeline(response, file, (err) => {
       if (err) console.error("Pipeline failed.", err);
       else {
