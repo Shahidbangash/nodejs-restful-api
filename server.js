@@ -158,11 +158,9 @@ app.get("/parse-url", cors(corsOptions), async function (req, res, next) {
         // );
         // res.json({ data: "response", file });
         // new Buffer(file).toString('base64')
-        var base64File = fs.readFileSync(file.path, { encoding: "base64" });
+        var base64File = fs.readFileSync(file.path , {encoding:'base64'})
         // res.download(file.path);
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Headers", "X-Requested-With");
-        res.status(200).send(base64File);
+        res.send(base64File);
       }
     });
   });
@@ -170,49 +168,49 @@ app.get("/parse-url", cors(corsOptions), async function (req, res, next) {
 
 app.get("/proxy-link", cors(corsOptions), async function (req, res, next) {
   // cors(req, res, () => {
-  console.log("Query:", req.query);
-  console.log("Body:", req.body);
+    console.log("Query:", req.query);
+    console.log("Body:", req.body);
 
-  let url = req.query.url;
+    let url = req.query.url;
 
-  if (!url) {
-    url = req.body.url;
-  }
+    if (!url) {
+      url = req.body.url;
+    }
 
-  if (!url) {
-    res.status(403).send("URL is empty.");
-  }
+    if (!url) {
+      res.status(403).send("URL is empty.");
+    }
 
-  console.log("Request:", url);
-  fetch(url)
-    .then((data) => {
-      return data.blob();
-    })
-    .then((post) => {
-      console.log(`post is ${post}`);
-      res.json(post);
-    });
+    console.log("Request:", url);
+    fetch(url)
+      .then((data) => {
+        return data.blob();
+      })
+      .then((post) => {
+        console.log(`post is ${post}`);
+        res.json(post)
+      });
 
-  // fetch(url, {
-  //   method: req.method,
-  //   body:
-  //     req.get("content-type") === "application/json"
-  //       ? JSON.stringify(req.body)
-  //       : req.body,
-  //   headers: {
-  //     "Content-Type": req.get("Content-Type"),
-  //   },
-  // })
-  //   .then((r) =>
-  //     r.headers.get("content-type") === "application/json"
-  //       ? r.json()
-  //       : r.text()
-  //   )
-  //   .then((body) => {
-  //     res.header("Access-Control-Allow-Origin", "*");
-  //     res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  //     return res.status(200).send(body);
-  //   });
+    // fetch(url, {
+    //   method: req.method,
+    //   body:
+    //     req.get("content-type") === "application/json"
+    //       ? JSON.stringify(req.body)
+    //       : req.body,
+    //   headers: {
+    //     "Content-Type": req.get("Content-Type"),
+    //   },
+    // })
+    //   .then((r) =>
+    //     r.headers.get("content-type") === "application/json"
+    //       ? r.json()
+    //       : r.text()
+    //   )
+    //   .then((body) => {
+    //     res.header("Access-Control-Allow-Origin", "*");
+    //     res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    //     return res.status(200).send(body);
+    //   });
   // });
 });
 
