@@ -122,7 +122,7 @@ app.post("/parse-url", cors(corsOptions), function (req, res, next) {
   });
 });
 
-app.get("/parse-url", cors(corsOptions), function (req, res, next) {
+app.get("/parse-url", cors(corsOptions), async  function (req, res, next) {
   // const url = req.params.url;
   var url = req.query.url;
   console.log(`URL is ${url}`);
@@ -148,19 +148,32 @@ app.get("/parse-url", cors(corsOptions), function (req, res, next) {
   console.log(`Client is ${url}`);
   console.log(`New URL Protocol is ${new URL(url).protocol}`);
   http.get(url, (response) => {
-    pipeline(response, file, (err) => {
+    pipeline(response, file,  (err) => {
       if (err) console.error("Pipeline failed.", err);
       else {
-        console.log(`file $file`);
-        console.log("Pipeline succeeded.");
+        // console.log(`file $file`);
+        // console.log("Pipeline succeeded.");
+        // var data = await getBase64(file).then(
+        //   data => console.log(data)
+        // );
         // res.json({ data: "response", file });
         // new Buffer(file).toString('base64')
-        // res.download(file.path);
-        res.download(new Buffer(file).toString("base64"));
+        res.download(file.path);
+        // res.download(data);
+        
       }
     });
   });
 });
+
+function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
 
 app.post(
   "/send-notification",
