@@ -2,12 +2,13 @@ var express = require("express");
 var cors = require("cors");
 var app = express();
 var admin = require("firebase-admin");
-var http = require("https");
 var fs = require("fs");
 const path = require("path");
 const url = require("url");
 require("dotenv").config();
 var bodyParser = require("body-parser");
+var http = require("http");
+var https = require("https");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -96,34 +97,37 @@ app.post("/fetchLocation", cors(corsOptions), function (request, res, next) {
 
 app.post("/parse-url", cors(corsOptions), function (req, res, next) {
   const url = req.body["url"] || req.body.url;
-
-  const file = fs.createWriteStream("./file.png");
-
-  http.get(url, (response) => {
+  const file = fs.createWriteStream("./file.jpg");
+  // url = new URL(url);
+  var client = new URL(url).protocol == "https" ? https : http;
+  client.get(url, (response) => {
     pipeline(response, file, (err) => {
       if (err) console.error("Pipeline failed.", err);
       else {
         console.log(`file $file`);
         console.log("Pipeline succeeded.");
-        var filePath = path.join(__dirname, "file.png");
-        res.download(filePath);
+        // res.json({ data: "response", file });
+        res.download(file.path);
       }
     });
   });
 });
 
-app.get("/parse-url", cors(corsOptions), async function (req, res, next) {
-  const url = req.params.url;
-
+app.get("/parse-url", cors(corsOptions), function (req, res, next) {
+  // const url = req.params.url;
+  const url = req.query.url;
+  console.log(`URL is ${url}`);
   const file = fs.createWriteStream("./file.jpg");
-
-  await http.get("http://via.placeholder.com/150/92c952", (response) => {
+  // url = new URL(url);
+  var client = new URL(url).protocol == "https" ? https : http;
+  client.get(url, (response) => {
     pipeline(response, file, (err) => {
       if (err) console.error("Pipeline failed.", err);
       else {
         console.log(`file $file`);
         console.log("Pipeline succeeded.");
-        res.json({ data: "response" });
+        // res.json({ data: "response", file });
+        res.download(file.path);
       }
     });
   });
