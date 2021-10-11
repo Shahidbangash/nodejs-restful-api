@@ -9,6 +9,7 @@ require("dotenv").config();
 var bodyParser = require("body-parser");
 var http = require("http");
 var https = require("https");
+const imageToBase64 = require("image-to-base64");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -107,7 +108,15 @@ app.post("/parse-url", cors(corsOptions), function (req, res, next) {
         console.log(`file $file`);
         console.log("Pipeline succeeded.");
         // res.json({ data: "response", file });
-        res.download(file.path);
+        // res.download(file.path);
+        imageToBase64(file.path) // insert image url here.
+          .then((response) => {
+            // console.log(response); // the response will be the string base64.
+            res.send(response)
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     });
   });
@@ -117,10 +126,10 @@ app.get("/parse-url", cors(corsOptions), function (req, res, next) {
   // const url = req.params.url;
   var url = req.query.url;
   console.log(`URL is ${url}`);
-  if ( url === null){
+  if (url === null) {
     res.status(400).json({
-      error:"URL is Missing",
-      message:"URL is Mising",
+      error: "URL is Missing",
+      message: "URL is Mising",
     });
   }
 
@@ -128,13 +137,13 @@ app.get("/parse-url", cors(corsOptions), function (req, res, next) {
   // url = new URL(url);
   var client = new URL(url).protocol == "https" ? https : http;
 
-  if (new String(url).split(":")[0].includes("s")){
+  if (new String(url).split(":")[0].includes("s")) {
     console.log("URL is s");
     var urlList = new String(url).split(":");
-    urlList[0] = new String(urlList[0]).replace("s" ,"");
-     url = urlList[0] + ":" + urlList[1];
+    urlList[0] = new String(urlList[0]).replace("s", "");
+    url = urlList[0] + ":" + urlList[1];
   }
-  
+
   // console.log(`URL is ${url}`);
   console.log(`Client is ${url}`);
   console.log(`New URL Protocol is ${new URL(url).protocol}`);
@@ -145,7 +154,9 @@ app.get("/parse-url", cors(corsOptions), function (req, res, next) {
         console.log(`file $file`);
         console.log("Pipeline succeeded.");
         // res.json({ data: "response", file });
-        res.download(file.path);
+        // new Buffer(file).toString('base64')
+        // res.download(file.path);
+        res.download(new Buffer(file).toString("base64"));
       }
     });
   });

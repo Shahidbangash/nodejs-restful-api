@@ -19,6 +19,7 @@
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "i": "^0.3.6",
+    "image-to-base64": "^2.2.0",
     "mongoose": "^5.12.13",
     "node-fetch": "^2.6.1",
     "nodemon": "^2.0.12",
