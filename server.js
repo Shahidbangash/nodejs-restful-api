@@ -10,7 +10,7 @@ var bodyParser = require("body-parser");
 var http = require("http");
 var https = require("https");
 const imageToBase64 = require("image-to-base64");
-
+const fetch = require("node-fetch");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -112,7 +112,7 @@ app.post("/parse-url", cors(corsOptions), function (req, res, next) {
         imageToBase64(file.path) // insert image url here.
           .then((response) => {
             // console.log(response); // the response will be the string base64.
-            res.send(response)
+            res.send(response);
           })
           .catch((error) => {
             console.log(error);
@@ -122,7 +122,7 @@ app.post("/parse-url", cors(corsOptions), function (req, res, next) {
   });
 });
 
-app.get("/parse-url", cors(corsOptions), async  function (req, res, next) {
+app.get("/parse-url", cors(corsOptions), async function (req, res, next) {
   // const url = req.params.url;
   var url = req.query.url;
   console.log(`URL is ${url}`);
@@ -148,7 +148,7 @@ app.get("/parse-url", cors(corsOptions), async  function (req, res, next) {
   console.log(`Client is ${url}`);
   console.log(`New URL Protocol is ${new URL(url).protocol}`);
   http.get(url, (response) => {
-    pipeline(response, file,  (err) => {
+    pipeline(response, file, (err) => {
       if (err) console.error("Pipeline failed.", err);
       else {
         // console.log(`file $file`);
@@ -160,9 +160,53 @@ app.get("/parse-url", cors(corsOptions), async  function (req, res, next) {
         // new Buffer(file).toString('base64')
         res.download(file.path);
         // res.download(data);
-        
       }
     });
+  });
+});
+
+app.get("/proxy-link", cors(corsOptions), async function (req, res, next) {
+  cors(req, res, () => {
+    console.log("Query:", req.query);
+    console.log("Body:", req.body);
+
+    let url = req.query.url;
+
+    if (!url) {
+      url = req.body.url;
+    }
+
+    if (!url) {
+      res.status(403).send("URL is empty.");
+    }
+
+    console.log("Request:", url);
+
+    // disallow blocked phrases
+    if (url.match(blockedPhrases)) {
+      res.status(403).send("Phrase in URL is disallowed.");
+    }
+
+    fetch(url, {
+      method: req.method,
+      body:
+        req.get("content-type") === "application/json"
+          ? JSON.stringify(req.body)
+          : req.body,
+      headers: {
+        "Content-Type": req.get("Content-Type"),
+      },
+    })
+      .then((r) =>
+        r.headers.get("content-type") === "application/json"
+          ? r.json()
+          : r.text()
+      )
+      .then((body) => {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        return res.status(200).send(body);
+      });
   });
 });
 
@@ -171,7 +215,7 @@ function getBase64(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
+    reader.onerror = (error) => reject(error);
   });
 }
 
