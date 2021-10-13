@@ -151,15 +151,9 @@ app.get("/parse-url", cors(corsOptions), async function (req, res, next) {
     pipeline(response, file, (err) => {
       if (err) console.error("Pipeline failed.", err);
       else {
-        // console.log(`file $file`);
-        // console.log("Pipeline succeeded.");
-        // var data = await getBase64(file).then(
-        //   data => console.log(data)
-        // );
-        // res.json({ data: "response", file });
-        // new Buffer(file).toString('base64')
+       
         var base64File = fs.readFileSync(file.path , {encoding:'base64'})
-        // res.download(file.path);
+      
         res.send(base64File);
       }
     });
@@ -214,14 +208,6 @@ app.get("/proxy-link", cors(corsOptions), async function (req, res, next) {
   // });
 });
 
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-}
 
 app.post(
   "/send-notification",
@@ -249,10 +235,7 @@ app.post(
           title: senderName,
           body: messageContent,
         },
-        // data: {
-        //   notificationType: req.body["notificationType"] || "notprovided",
-        //   senderID: req.body["senderID"],
-        // },
+      
       })
       .then(() => {
         console.log("object");
