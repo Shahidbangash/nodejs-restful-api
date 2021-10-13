@@ -1,8 +1,7 @@
 var mongoose = require("mongoose");
 
 require("dotenv").config();
-// const MongoClient = require("mongodb").MongoClient;
-// mongoose.connect('mongodb://yourMongoDBURIGoesHere');
+
 
 const dbPassword = process.env.DBPASSWORD;
 const dbUser = process.env.dbUser;
